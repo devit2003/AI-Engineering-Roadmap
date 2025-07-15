@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -218,6 +218,24 @@ export default function AiLearningProgressApp() {
   const [selectedWeek, setSelectedWeek] = useState<number | null>(null);
   const [progress, setProgress] = useState<ProgressType>({});
 
+  // Load progress dari localStorage saat komponen pertama kali mount
+  useEffect(() => {
+    const savedProgress = localStorage.getItem("ai-learning-progress");
+    if (savedProgress) {
+      try {
+        setProgress(JSON.parse(savedProgress));
+      } catch {
+        console.warn("Progress data corrupted, resetting...");
+        setProgress({});
+      }
+    }
+  }, []);
+
+  // Simpan progress ke localStorage setiap kali progress berubah
+  useEffect(() => {
+    localStorage.setItem("ai-learning-progress", JSON.stringify(progress));
+  }, [progress]);
+
   const handleCheck = (week: string, topic: string) => {
     setProgress((prev) => ({
       ...prev,
@@ -241,30 +259,48 @@ export default function AiLearningProgressApp() {
   return (
     <div className="max-w-5xl mx-auto p-6 font-sans bg-gray-50 min-h-screen">
       <header className="text-center mb-12 pt-8">
-        <h1 className="text-4xl font-bold text-teal-700">Devit AI Learning Roadmap</h1>
-        <p className="text-gray-600 mt-3">Journey to mastering Artificial Intelligence - One week at a time</p>
+        <h1 className="text-4xl font-bold text-teal-700">
+          Devit AI Learning Roadmap
+        </h1>
+        <p className="text-gray-600 mt-3">
+          Journey to mastering Artificial Intelligence - One week at a time
+        </p>
       </header>
 
       {selectedWeek === null ? (
         <div className="grid grid-cols-1 gap-5">
           {roadmap.map((item, index) => (
-            <div 
-              key={index} 
+            <div
+              key={index}
               className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all border border-gray-100 overflow-hidden"
             >
               <div
                 onClick={() => setSelectedWeek(index)}
                 className="bg-teal-600 text-white px-6 py-4 cursor-pointer flex justify-between items-center hover:bg-teal-700 transition-colors"
               >
-                <span className="font-medium">{item.week}: {item.title}</span>
-                <span className={`text-xs ${getWeekProgress(item.week) === 100 ? 'bg-emerald-500' : 'bg-amber-500'} px-3 py-1 rounded-full`}>
-                  {getWeekProgress(item.week) === 100 ? "Completed" : `${Math.round(getWeekProgress(item.week))}%`}
+                <span className="font-medium">
+                  {item.week}: {item.title}
+                </span>
+                <span
+                  className={`text-xs ${
+                    getWeekProgress(item.week) === 100
+                      ? "bg-emerald-500"
+                      : "bg-amber-500"
+                  } px-3 py-1 rounded-full`}
+                >
+                  {getWeekProgress(item.week) === 100
+                    ? "Completed"
+                    : `${Math.round(getWeekProgress(item.week))}%`}
                 </span>
               </div>
               <div className="px-6 py-3">
-                <Progress 
-                  value={getWeekProgress(item.week)} 
-                  className={`h-2 rounded-full bg-gray-100 ${getWeekProgress(item.week) === 100 ? "progress-complete" : "progress-incomplete"}`}
+                <Progress
+                  value={getWeekProgress(item.week)}
+                  className={`h-2 rounded-full bg-gray-100 ${
+                    getWeekProgress(item.week) === 100
+                      ? "progress-complete"
+                      : "progress-incomplete"
+                  }`}
                 />
               </div>
             </div>
@@ -272,32 +308,40 @@ export default function AiLearningProgressApp() {
         </div>
       ) : (
         <div className="max-w-3xl mx-auto">
-          <Button 
-            variant="ghost" 
-            className="mb-6 text-teal-600 hover:bg-teal-50" 
+          <Button
+            variant="ghost"
+            className="mb-6 text-teal-600 hover:bg-teal-50"
             onClick={() => setSelectedWeek(null)}
           >
             <ChevronLeft className="mr-2" size={18} /> Back to roadmap
           </Button>
-          
+
           <div className="bg-white rounded-lg shadow-sm p-6 mb-6 border border-gray-100">
             <h2 className="text-2xl font-semibold text-gray-800 mb-2">
               {roadmap[selectedWeek].week}: {roadmap[selectedWeek].title}
             </h2>
-            <Progress 
-              value={getWeekProgress(roadmap[selectedWeek].week)} 
-              className={`h-2 rounded-full bg-gray-100 mb-6 ${getWeekProgress(roadmap[selectedWeek].week) === 100 ? "bg-emerald-400" : "bg-teal-400"}`}
+            <Progress
+              value={getWeekProgress(roadmap[selectedWeek].week)}
+              className={`h-2 rounded-full bg-gray-100 mb-6 ${
+                getWeekProgress(roadmap[selectedWeek].week) === 100
+                  ? "bg-emerald-400"
+                  : "bg-teal-400"
+              }`}
             />
-            
+
             <div className="space-y-3">
               {roadmap[selectedWeek].topics.map((topic, idx) => (
-                <div 
-                  key={idx} 
+                <div
+                  key={idx}
                   className="flex items-center gap-4 p-4 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100"
                 >
                   <Checkbox
-                    checked={progress[roadmap[selectedWeek].week]?.[topic] || false}
-                    onCheckedChange={() => handleCheck(roadmap[selectedWeek].week, topic)}
+                    checked={
+                      progress[roadmap[selectedWeek].week]?.[topic] || false
+                    }
+                    onCheckedChange={() =>
+                      handleCheck(roadmap[selectedWeek].week, topic)
+                    }
                     className="border-gray-300 data-[state=checked]:bg-teal-500 data-[state=checked]:border-teal-500"
                   />
                   <span className="text-gray-700">{topic}</span>
@@ -307,7 +351,7 @@ export default function AiLearningProgressApp() {
           </div>
         </div>
       )}
-      
+
       <footer className="text-center mt-16 pb-8 text-gray-500 italic">
         "The expert in anything was once a beginner. Keep going!"
       </footer>
