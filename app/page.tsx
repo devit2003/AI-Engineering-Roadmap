@@ -241,7 +241,7 @@ export default function AiLearningProgressApp() {
   return (
     <div className="max-w-5xl mx-auto p-6 font-sans bg-gray-50 min-h-screen">
       <header className="text-center mb-12 pt-8">
-        <h1 className="text-4xl font-bold text-teal-700">My AI Learning Roadmap</h1>
+        <h1 className="text-4xl font-bold text-teal-700">Devit AI Learning Roadmap</h1>
         <p className="text-gray-600 mt-3">Journey to mastering Artificial Intelligence - One week at a time</p>
       </header>
 
